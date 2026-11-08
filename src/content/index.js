@@ -7,13 +7,14 @@
 //   why / how     -> the cartographer's annotations shown on the map
 //   lessons       -> waypoints; `charted: true` once a lesson has full content
 //
-// Lessons for P0, P1 and P2 live in their own files (full content). Later phases
+// Lessons for P0 to P3 live in their own files (full content). Later phases
 // are "uncharted": titles + why are known, the survey (example/trial) is not.
 // Ask Claude to chart them one phase at a time.
 // ---------------------------------------------------------------------------
 import p0, { checkpoint as p0Checkpoint } from './phases/p0-js.js'
 import p1, { checkpoint as p1Checkpoint } from './phases/p1-rendering.js'
 import p2, { checkpoint as p2Checkpoint } from './phases/p2-effects.js'
+import p3, { checkpoint as p3Checkpoint } from './phases/p3-state.js'
 
 /** Helper for not-yet-surveyed lessons. */
 const stub = (id, title, why, prereqs = []) => ({ id, title, why, prereqs, charted: false })
@@ -72,15 +73,8 @@ export const PHASES = [
     seed: 37,
     why: 'Where state lives decides what re-renders and how hard bugs are to find.',
     how: 'Colocate first, lift when shared, reduce when transitions are complex, and reach for context or stores only at real boundaries.',
-    lessons: [
-      stub('reducer', 'useReducer', 'Move "how state changes" out of handlers into one pure, testable function.'),
-      stub('context', 'Context', 'Context removes prop-drilling, but every consumer re-renders when the value changes.', ['reducer']),
-      stub('context-cost', 'The cost of context', 'A new object literal as the value re-renders every consumer on every parent render.', ['context']),
-      stub('colocation', 'Colocation', 'State as close as possible to where it is used keeps re-renders small and code obvious.'),
-      stub('external-store', 'useSyncExternalStore', 'The safe bridge to state that lives outside React, without tearing.', ['context-cost']),
-      stub('zustand', 'A lightweight store', 'Selector-based stores re-render only the components that read the changed slice.', ['external-store']),
-      stub('url-state', 'The URL as state', 'Filters, tabs and pages belong in the URL so they survive reloads and can be shared.', ['colocation']),
-    ],
+    lessons: p3,
+    checkpoint: p3Checkpoint,
   },
   {
     id: 'p4',

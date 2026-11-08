@@ -8,8 +8,9 @@ import ReconciliationTree from './ReconciliationTree.jsx'
 import EventLoop from './EventLoop.jsx'
 import EffectLifecycle from './EffectLifecycle.jsx'
 import StaleClosureLab from './StaleClosureLab.jsx'
+import ContextRerenderMap from './ContextRerenderMap.jsx'
 
-const REGISTRY = { SnapshotInspector, RenderCommitTimeline, BatchingQueue, ReconciliationTree, EventLoop, EffectLifecycle, StaleClosureLab }
+const REGISTRY = { SnapshotInspector, RenderCommitTimeline, BatchingQueue, ReconciliationTree, EventLoop, EffectLifecycle, StaleClosureLab, ContextRerenderMap }
 
 export default function Apparatus({ name }) {
   const Viz = REGISTRY[name]
