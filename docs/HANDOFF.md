@@ -1,7 +1,7 @@
 # Handoff: state of the Atlas (2026-11-08)
 
 Read this first in a new session, then the root `CLAUDE.md` (coaching contract, architecture, authoring rules).
-Last commit: `f80c06c` on `main`, pushed to `projectGloria/ReactNow`. The working tree was clean.
+Last commit: `348790c` (P3) on `main`, pushed to `projectGloria/ReactNow`. P0 to P3 are charted.
 
 ---
 
@@ -31,12 +31,12 @@ Last commit: `f80c06c` on `main`, pushed to `projectGloria/ReactNow`. The workin
 
 ### Infrastructure
 - `vite-plugin-ledger.js` writes `journal/` to disk. It only runs in dev; in production the telegram says so.
-- Tests: `npm test` (Vitest + jsdom) runs 46 tests: game rules, router, and every charted trial (the buggy code must fail, the example must render).
+- Tests: `npm test` (Vitest + jsdom) runs 76 tests: game rules, router, and every charted trial (the buggy code must fail, the example must render).
 - `npm run lint` (ESLint 9) uses `react/jsx-no-undef`. The build does **not** catch a missing JSX import; lint does.
-- The main bundle was 628 KB and is now 335 KB, because the journal (react-live, sucrase, prism) is a lazy chunk.
+- The main bundle was 628 KB, dropped to 335 KB when the journal (react-live, sucrase, prism) became a lazy chunk, and is back up to 404 KB because lesson content ships in the main chunk (about +35 KB per phase). Lazy-loading phase files is on the optional list.
 - Accessibility: sheets get focus on mount and restore it on close; the chart is `inert` under overlays. The `inert` attribute sits on a `display: contents` wrapper, because it does nothing on `<svg>`.
 - Git: `.gitattributes` forces LF endings, and `art/raw/**/*.png` is stored in **LFS**.
-- The journal was reset: `progress.json` does not exist yet, `log.jsonl` is empty, and there are no notes.
+- The journal holds Nihil's real data since the 2026-11-08 reset (committed in `31ddb8e`). Treat it as his record.
 
 ### Content
 
@@ -44,7 +44,9 @@ Last commit: `f80c06c` on `main`, pushed to `projectGloria/ReactNow`. The workin
 |---|---|
 | P0 JS gaps (`p0-js.js`) | 8 lessons fully charted, visualizer: EventLoop |
 | P1 Rendering (`p1-rendering.js`) | 9 lessons fully charted, visualizers: SnapshotInspector, RenderCommitTimeline, BatchingQueue, ReconciliationTree |
-| P2 to Capstone | **47 stubs** in `src/content/index.js` (title, why and prerequisites only, `charted: false`); the gates use generic fallback questions |
+| P2 Effects (`p2-effects.js`) | 8 lessons fully charted, visualizers: EffectLifecycle, StaleClosureLab |
+| P3 State architecture (`p3-state.js`) | 7 lessons fully charted, visualizer: ContextRerenderMap. Snippets use `useRenderMeter` to make re-renders visible; the zustand lesson uses a hand-rolled selector store (snippets have no imports) |
+| P4 to Capstone | **32 stubs** in `src/content/index.js` (title, why and prerequisites only, `charted: false`); the gates use generic fallback questions |
 
 ### Art (Gemini, then `npm run art`, then `src/assets/art/*.webp`)
 - **Done:**
@@ -65,16 +67,9 @@ Last commit: `f80c06c` on `main`, pushed to `projectGloria/ReactNow`. The workin
 ## 2. What needs to be done
 
 ### Next (in priority order)
-1. **Chart P2, The Effect Marshes.** It is the next territory, and once P1 is sealed the app will report `awaitingCharts`.
-   - Create `src/content/phases/p2-effects.js` following the lesson shape at the top of `p1-rendering.js`.
-   - Replace the stubs in `src/content/index.js`, and **keep the lesson ids**: `sync-external`, `deps-closures`, `cleanup`, `not-needed`, `refs`, `effect-event`, `custom-hooks`, `strict-mode`.
-   - Write a `checkpoint` array of 3 or 4 questions.
-   - Check `useEffectEvent` and StrictMode behaviour against the current React 19 docs (context7) before writing.
-   - Write visualizers **EffectLifecycle** and **StaleClosureLab**, and register them in `src/visualizers/index.jsx`.
-   - Done means: `npm test` is green (the buggy trial fails), each fix has been checked by hand to pass, lint is clean, and the lessons were clicked through in the browser.
+1. **Nihil studies; content is ahead of him.** P0 to P3 hold 32 charted lessons. Content is not the bottleneck until P1 is sealed and its gate passed (P2 stays locked until then).
 2. **Process the Gemini art once the quota resets.** Drop the PNGs into `art/raw/<folder>/`, run `npm run art`, check them visually on the plate and in the Captain's Log, and adjust `OVERRIDES` in `scripts/ink-art.mjs` (trim, max size) if needed.
-3. **Chart P3 to P8 and the Capstone**, one phase per iteration, with the remaining visualizers:
-   - ContextRerenderMap (P3)
+3. **Chart P4 to P8 and the Capstone**, one phase per iteration, the same way P2 (`31ddb8e`) and P3 (`348790c`) were done: outline first and wait for Nihil's OK, then lessons, checkpoint and visualizers. Remaining visualizers:
    - SuspenseWaterfall (P4)
    - TransitionPriority (P5)
 
@@ -84,8 +79,10 @@ Last commit: `f80c06c` on `main`, pushed to `projectGloria/ReactNow`. The workin
 - There is no CI. A GitHub Action running `npm test`, `npm run lint` and `npm run build` would be cheap.
 
 ### Notes and gotchas
-- Never edit `journal/` (it is Nihil's record) unless he asks. Two dev servers on different ports (5173 and 5174) write to the **same** `journal/`. A stale tab can overwrite progress, so reload old tabs after a reset.
+- Never edit `journal/` (it is Nihil's record) unless he asks. Merely **opening** the app on the dev server writes `session_start` / `lesson_opened` events, so for browser checks run a throwaway Vite config whose `ledger({ dir })` points at a temp folder on another port, seeded with a `progress.json` that passes the earlier gates. Two dev servers on different ports (5173 and 5174) write to the **same** `journal/`. A stale tab can overwrite progress, so reload old tabs after a reset.
 - On Windows, Python in text mode writes CRLF. `.gitattributes` normalizes line endings on commit; for files written by hand, use `newline=''`.
 - Snippets must define `function App`; hooks come from `src/journal/liveScope.js`, so snippets have no imports.
 - jsdom has no `CSS.escape`, so `tests/trials.test.js` shims it.
+- Checking a trial fix by hand: `npm test` only proves the buggy code fails. Run the fixed code through `runTrial` (in a scratch Vitest file, and in the browser via `await import('/src/journal/trialHarness.js')` inside the page). Don't drive the Trial editor with the browser tool: react-live's contenteditable ignores programmatic typing/paste and submits stale code.
+- Trials run under StrictMode: design checks so a missing cleanup or impure reducer fails deterministically, and never leave a timer or subscription running after unmount (trials run in the live page).
 - Code style: no semicolons, single quotes, print width 160, and `//` comments that explain *why*.
