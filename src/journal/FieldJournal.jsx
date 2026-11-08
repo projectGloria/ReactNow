@@ -2,11 +2,14 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { navigate } from '../router/useHashRoute.js'
 import { useExpedition, useRecord } from '../store/ExpeditionProvider.jsx'
-import { XP, isMastered, isUnlocked } from '../store/derive.js'
+import { XP, isMastered, isReviewDue, isUnlocked } from '../store/derive.js'
+import { NOTE_MIN } from '../store/expedition.js'
 import { WaxSeal } from '../game/WaxSeal.jsx'
-import { Specimen, Inline } from './Specimen.jsx'
+import { Specimen } from './Specimen.jsx'
+import { Inline } from './Inline.jsx'
 import { Trial } from './Trial.jsx'
 import { Marginalia } from './Marginalia.jsx'
+import { dialogProps } from '../ui/dialog.js'
 
 // Visualizers are code-split: you only download the apparatus you open.
 const Apparatus = lazy(() => import('../visualizers/index.jsx'))
@@ -20,8 +23,12 @@ export function FieldJournal({ phase, lesson, index }) {
   // Captured once at mount (FieldJournal is keyed by lesson): lets us play the
   // stamp animation only when the seal is earned *during this visit*.
   const [masteredAtOpen] = useState(mastered)
+  const reviewDue = isReviewDue(rec)
+  // Same trick for reviews: re-stamp animation only if it was due when you arrived.
+  const [dueAtOpen] = useState(reviewDue)
   const locked = !isUnlocked(progress, phase.index)
-  const [tab, setTab] = useState('specimen')
+  // A due review opens straight on the trial: that's the work to do.
+  const [tab, setTab] = useState(() => (reviewDue ? 'trial' : 'specimen'))
 
   // Logging "you opened this" is synchronising with an external system (the
   // journal), so an effect is right. The ref stops StrictMode's dev double-mount
@@ -39,7 +46,7 @@ export function FieldJournal({ phase, lesson, index }) {
 
   return (
     <div className="overlay" onClick={(e) => e.target === e.currentTarget && navigate(`/${phase.id}`)}>
-      <article className="book" aria-labelledby="lesson-title">
+      <article className="book" {...dialogProps} aria-labelledby="lesson-title">
         <button className="book-close" onClick={() => navigate(`/${phase.id}`)} aria-label="Close and return to the survey">
           ✕
         </button>
@@ -98,7 +105,7 @@ export function FieldJournal({ phase, lesson, index }) {
 
           {lesson.charted && !locked && (
             <>
-              <SealProgress rec={rec} mastered={mastered} fresh={mastered && !masteredAtOpen} />
+              <SealProgress rec={rec} mastered={mastered} reviewDue={reviewDue} fresh={(mastered && !masteredAtOpen) || (dueAtOpen && !reviewDue)} />
               <Marginalia noteKey={key} title={`${phase.num} · ${lesson.title}`} onSaved={(length) => ev('note_saved', { length })} />
             </>
           )}
@@ -131,7 +138,14 @@ export function FieldJournal({ phase, lesson, index }) {
                 </Suspense>
               )}
               <div hidden={tab !== 'trial'}>
-                <Trial trial={lesson.trial} passed={rec.trialPassed} attempts={rec.trialAttempts ?? 0} onAttempt={(r) => ev('trial_attempt', r)} />
+                <Trial
+                  trial={lesson.trial}
+                  passed={rec.trialPassed}
+                  reviewing={reviewDue}
+                  attempts={rec.trialAttempts ?? 0}
+                  // review: true makes a passing re-run count as a review in the reducer
+                  onAttempt={(r) => ev('trial_attempt', reviewDue ? { ...r, review: true } : r)}
+                />
               </div>
             </>
           ) : (
@@ -174,16 +188,21 @@ function Tab({ id, tab, setTab, label, hint, done }) {
   )
 }
 
-function SealProgress({ rec, mastered, fresh }) {
+function SealProgress({ rec, mastered, reviewDue, fresh }) {
   const items = [
     [rec.edited, `Experiment with the specimen (+${XP.edited} XP)`],
     [rec.trialPassed, `Pass the trial (+${XP.trial} XP, ${XP.trialFirstTry} on the first try)`],
-    [rec.noted, `Write a margin note (+${XP.noted} XP)`],
+    [rec.noted, `Write a margin note of ${NOTE_MIN}+ characters (+${XP.noted} XP)`],
   ]
   return (
-    <div className={`seal-progress${mastered ? ' is-sealed' : ''}`}>
-      <div className="seal-slot">{mastered ? <WaxSeal size={64} fresh={fresh} title="Waypoint sealed" /> : <div className="seal-empty">seal</div>}</div>
+    <div className={`seal-progress${mastered ? ' is-sealed' : ''}${reviewDue ? ' is-review' : ''}`}>
+      <div className="seal-slot">{mastered ? <WaxSeal size={64} fresh={fresh} title={reviewDue ? 'Seal fading: review due' : 'Waypoint sealed'} /> : <div className="seal-empty">seal</div>}</div>
       <ul>
+        {reviewDue && (
+          <li className="review-due">
+            <span className="mark">↻</span> Review due: the seal is fading. Pass the trial again from the original buggy code to re-stamp it.
+          </li>
+        )}
         {items.map(([ok, label]) => (
           <li key={label} className={ok ? 'ok' : ''}>
             <span className="mark">{ok ? '✓' : '○'}</span> {label}

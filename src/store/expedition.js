@@ -19,6 +19,12 @@ export function emptyProgress() {
   return { version: 1, startDate: today(), planDays: 36, lessons: {}, checkpoints: {} }
 }
 
+/**
+ * A margin note counts toward the seal at ~2 real sentences. One word ("ok")
+ * used to be enough, which made the seal a checkbox instead of evidence.
+ */
+export const NOTE_MIN = 120
+
 const lessonKey = (e) => `${e.phase}/${e.lesson}`
 
 /** Pure: (progress, event) -> progress. Never mutates. */
@@ -33,7 +39,13 @@ export function applyEvent(progress, e) {
       const next = { ...prev }
       if (e.type === 'lesson_opened') next.opened ??= e.ts
       if (e.type === 'example_edited') next.edited = true
-      if (e.type === 'note_saved') next.noted = e.length > 0
+      if (e.type === 'note_saved') next.noted = e.length >= NOTE_MIN
+      // A passing re-run of an already-passed trial is a *review*: it re-stamps
+      // the seal and pushes the next review further out (see derive.js).
+      if (e.type === 'trial_attempt' && prev.trialPassed && e.review && e.pass) {
+        next.reviews = (prev.reviews ?? 0) + 1
+        next.reviewedAt = e.ts
+      }
       if (e.type === 'trial_attempt' && !prev.trialPassed) {
         next.trialAttempts = prev.trialAttempts + 1
         if (e.pass) {

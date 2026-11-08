@@ -6,6 +6,7 @@ import { useExpedition } from '../store/ExpeditionProvider.jsx'
 import { toLocalDate } from '../store/expedition.js'
 import { RankMedal } from './RankMedal.jsx'
 import { RANKS, XP, computeStreak, computeXp, rankFor, schedule } from '../store/derive.js'
+import { dialogProps } from '../ui/dialog.js'
 
 const VERB = {
   session_start: null, // noise; counted as a session instead
@@ -37,7 +38,7 @@ export function CaptainsLog() {
 
   return (
     <div className="overlay" onClick={(e) => e.target === e.currentTarget && navigate('/')}>
-      <article className="sheet log">
+      <article className="sheet log" {...dialogProps} aria-label="Captain's Log">
         <button className="book-close" onClick={() => navigate('/')} aria-label="Close">
           ✕
         </button>
@@ -47,7 +48,7 @@ export function CaptainsLog() {
         <div className="log-stats">
           <Stat label="Day" value={`${sched.day} / ${sched.planDays}`} warn={sched.behind} />
           <Stat label="Streak" value={`${computeStreak(log)} days`} />
-          <Stat label="Sealed" value={`${sched.mastered} / ${sched.total}`} />
+          <Stat label="Sealed" value={`${sched.mastered} / ${sched.available}`} />
           <Stat label="XP" value={xp} />
         </div>
 

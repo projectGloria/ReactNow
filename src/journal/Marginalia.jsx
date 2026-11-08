@@ -2,6 +2,7 @@
 import { useRef, useSyncExternalStore } from 'react'
 import { useNote } from '../ledger/notes.js'
 import { ledgerStatus } from '../ledger/client.js'
+import { NOTE_MIN } from '../store/expedition.js'
 
 export function Marginalia({ noteKey, title, onSaved }) {
   const [body, setBody] = useNote(noteKey, title)
@@ -25,7 +26,11 @@ export function Marginalia({ noteKey, title, onSaved }) {
         spellCheck
       />
       <div className="marginalia-foot">
-        Saved to <code>journal/notes/{noteKey}.md</code>, where Claude can read it.
+        {/* Derived from the draft every keystroke: no state, just a length. */}
+        <span className={`note-meter${body.trim().length >= NOTE_MIN ? ' is-enough' : ''}`}>
+          {body.trim().length >= NOTE_MIN ? 'Enough for the seal ✓' : `${body.trim().length}/${NOTE_MIN} characters toward the seal`}
+        </span>{' '}
+        · Saved to <code>journal/notes/{noteKey}.md</code>, where Claude can read it.
       </div>
     </div>
   )

@@ -1,0 +1,10 @@
+# Line endings: LF in the repo and in the working tree, on every OS.
+# Stops Git on Windows from flipping files to CRLF (the noisy-diff warnings).
+* text=auto eol=lf
+
+# Binary art. Gemini's raw PNGs are large and get replaced wholesale, so they
+# live in Git LFS: the repo stores small pointers, not every revision's pixels.
+art/raw/**/*.png filter=lfs diff=lfs merge=lfs -text
+*.png binary
+*.webp binary
+*.woff2 binary

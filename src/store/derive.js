@@ -70,13 +70,59 @@ export function dayNumber(progress) {
 /** Flat ordered list of all lessons with their phase — the itinerary. */
 export const ITINERARY = PHASES.flatMap((p, pi) => p.lessons.map((l) => ({ phase: p, phaseIndex: pi, lesson: l })))
 
+/**
+ * The plan paces you through all lessons over `planDays`, but you can only be
+ * held to lessons that have actually been *written* (charted). Uncharted stubs
+ * are Claude's backlog, not yours: counting them made "behind schedule" fire by
+ * day 10 even with every available lesson sealed.
+ * Locked-but-charted lessons still count, so skipping a gate isn't a loophole.
+ */
 export function schedule(progress) {
   const day = dayNumber(progress)
   const total = ITINERARY.length
+  const available = ITINERARY.filter(({ lesson }) => lesson.charted).length
   const mastered = ITINERARY.filter(({ phase, lesson }) => isMastered(progress.lessons[`${phase.id}/${lesson.id}`])).length
   // Quota due by the *start* of today: you're only behind for days already over.
-  const expected = Math.min(total, Math.floor((total * Math.min(day - 1, progress.planDays)) / progress.planDays))
-  return { day, planDays: progress.planDays, total, mastered, expected, behind: mastered < expected }
+  const planned = Math.floor((total * Math.min(day - 1, progress.planDays)) / progress.planDays)
+  const expected = Math.min(available, planned)
+  return {
+    day,
+    planDays: progress.planDays,
+    total,
+    available,
+    mastered,
+    expected,
+    behind: mastered < expected,
+    // Everything written is sealed and the plan wants more: the content is late, not you.
+    awaitingCharts: mastered >= available && planned > available,
+  }
+}
+
+// ---- spaced review ----------------------------------------------------------
+// A seal is not forever. Expanding intervals (the classic spacing schedule):
+// first review 3 days after sealing, then 7, then 21, then monthly. You re-stamp
+// a seal by passing the lesson's trial again, from the original buggy code.
+export const REVIEW_DAYS = [3, 7, 21, 30]
+const DAY_MS = 86_400_000
+
+/** When this sealed lesson is next due for review (ms epoch), or null if not sealed. */
+export function reviewDueAt(rec) {
+  if (!isMastered(rec) || !rec.masteredAt) return null
+  const n = rec.reviews ?? 0
+  const last = Date.parse(rec.reviewedAt ?? rec.masteredAt)
+  return last + REVIEW_DAYS[Math.min(n, REVIEW_DAYS.length - 1)] * DAY_MS
+}
+
+export const isReviewDue = (rec, now = Date.now()) => {
+  const due = reviewDueAt(rec)
+  return due !== null && now >= due
+}
+
+/** Sealed lessons whose review is due, most overdue first. */
+export function dueReviews(progress, now = Date.now()) {
+  return ITINERARY.map((it) => ({ ...it, rec: progress.lessons[`${it.phase.id}/${it.lesson.id}`] }))
+    .filter(({ rec }) => isReviewDue(rec, now))
+    .sort((a, b) => reviewDueAt(a.rec) - reviewDueAt(b.rec))
 }
 
 /** Next suggested lesson: first un-mastered, charted lesson in an unlocked phase. */
@@ -97,6 +143,7 @@ export function summarize(progress, log) {
   const xp = computeXp(progress)
   const s = schedule(progress)
   const next = nextLesson(progress)
+  const reviews = dueReviews(progress)
   return {
     xp,
     rank: rankFor(xp).title,
@@ -104,7 +151,10 @@ export function summarize(progress, log) {
     day: s.day,
     lessonsMastered: s.mastered,
     lessonsExpectedByToday: s.expected,
+    lessonsCharted: s.available,
     behindSchedule: s.behind,
+    awaitingCharts: s.awaitingCharts,
+    reviewsDue: reviews.map(({ phase, lesson }) => `${phase.id}/${lesson.id}`),
     phasesPassed: PHASES.filter((p) => progress.checkpoints[p.id]?.passed).map((p) => p.id),
     suggestedNext: next ? `${next.phase.id}/${next.lesson.id}` : null,
     generatedAt: new Date().toISOString(),

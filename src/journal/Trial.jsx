@@ -4,7 +4,7 @@ import { Editor } from 'react-live'
 import { PARCHMENT_THEME } from './liveScope.js'
 import { runTrial } from './trialHarness.js'
 
-export function Trial({ trial, passed, attempts, onAttempt }) {
+export function Trial({ trial, passed, reviewing = false, attempts, onAttempt }) {
   const [code, setCode] = useState(trial.code)
   const [outcome, setOutcome] = useState(null)
   // React 19: async functions inside startTransition are "Actions"; isPending
@@ -42,7 +42,7 @@ export function Trial({ trial, passed, attempts, onAttempt }) {
           Reset code
         </button>
         <span className="trial-meta">
-          {passed ? 'Trial passed ✓' : attempts ? `${attempts} attempt${attempts > 1 ? 's' : ''} so far` : 'First try earns double XP'}
+          {reviewing ? 'Review: fix it again from scratch, without peeking at your notes' : passed ? 'Trial passed ✓' : attempts ? `${attempts} attempt${attempts > 1 ? 's' : ''} so far` : 'First try earns double XP'}
         </span>
       </div>
 

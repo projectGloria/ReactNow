@@ -7,53 +7,44 @@
 // The Atlas still zooms underneath (the route carries phaseId), so dismissing
 // the brief reveals a plate that's already in place.
 // ---------------------------------------------------------------------------
-import { checkpointFor } from "../content/index.js";
-import { navigate } from "../router/useHashRoute.js";
-import { useExpedition } from "../store/ExpeditionProvider.jsx";
-import { isMastered, isUnlocked } from "../store/derive.js";
-import { Inline } from "../journal/Specimen.jsx";
-import { WaxSeal } from "../game/WaxSeal.jsx";
+import { checkpointFor } from '../content/index.js'
+import { navigate } from '../router/useHashRoute.js'
+import { useExpedition } from '../store/ExpeditionProvider.jsx'
+import { isMastered, isReviewDue, isUnlocked } from '../store/derive.js'
+import { Inline } from '../journal/Inline.jsx'
+import { WaxSeal } from '../game/WaxSeal.jsx'
+import { dialogProps } from '../ui/dialog.js'
 
-const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"];
+const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X']
 
 export function RegionBrief({ phase }) {
-  const { progress } = useExpedition();
-  const unlocked = isUnlocked(progress, phase.index);
-  const cleared = Boolean(progress.checkpoints[phase.id]?.passed);
-  const recOf = (l) => progress.lessons[`${phase.id}/${l.id}`];
+  const { progress } = useExpedition()
+  const unlocked = isUnlocked(progress, phase.index)
+  const cleared = Boolean(progress.checkpoints[phase.id]?.passed)
+  const recOf = (l) => progress.lessons[`${phase.id}/${l.id}`]
   // All derived per render from progress: eight lessons, nothing worth memoizing.
-  const sealed = phase.lessons.filter((l) => isMastered(recOf(l))).length;
-  const charted = phase.lessons.some((l) => l.charted);
-  const next = unlocked
-    ? phase.lessons.find((l) => l.charted && !isMastered(recOf(l)))
-    : null;
+  const sealed = phase.lessons.filter((l) => isMastered(recOf(l))).length
+  const charted = phase.lessons.some((l) => l.charted)
+  const next = unlocked ? phase.lessons.find((l) => l.charted && !isMastered(recOf(l))) : null
   // Uncharted phases get generic fallback questions, so there's always a gate.
-  const questions = checkpointFor(phase).length;
-  const titleOf = Object.fromEntries(phase.lessons.map((l) => [l.id, l.title]));
+  const questions = checkpointFor(phase).length
+  const titleOf = Object.fromEntries(phase.lessons.map((l) => [l.id, l.title]))
 
-  const toMap = () => navigate(`/${phase.id}`);
-  const open = (l) => unlocked && l.charted && navigate(`/${phase.id}/${l.id}`);
+  const toMap = () => navigate(`/${phase.id}`)
+  const open = (l) => unlocked && l.charted && navigate(`/${phase.id}/${l.id}`)
 
   return (
     // Backdrop click = "show me the map", the same as the main button.
-    <div
-      className="overlay brief-overlay"
-      onClick={(e) => e.target === e.currentTarget && toMap()}
-    >
-      <article className="sheet brief" aria-labelledby="brief-title">
-        <button
-          className="book-close"
-          onClick={() => navigate("/")}
-          aria-label="Back to the Atlas"
-        >
+    <div className="overlay brief-overlay" onClick={(e) => e.target === e.currentTarget && toMap()}>
+      <article className="sheet brief" {...dialogProps} aria-labelledby="brief-title">
+        <button className="book-close" onClick={() => navigate('/')} aria-label="Back to the Atlas">
           ✕
         </button>
         {/* Landscape: the territory on the left, its waypoints across the right,
             so the whole brief fits one screen without scrolling. */}
         <header className="brief-side">
           <div className="page-kicker">
-            Plate {ROMAN[phase.index] ?? phase.index + 1} · {phase.num} · The
-            Surveyor's Brief
+            Plate {ROMAN[phase.index] ?? phase.index + 1} · {phase.num} · The Surveyor's Brief
           </div>
           <h1 id="brief-title" className="drop-title">
             {phase.landmark}
@@ -66,20 +57,13 @@ export function RegionBrief({ phase }) {
           <p className="brief-lead">{phase.how}</p>
 
           <p className="brief-stats">
-            {phase.lessons.length} waypoints · {sealed} sealed · {questions}{" "}
-            questions at the Customs House
-            {cleared && " · cleared ✓"}
+            {phase.lessons.length} waypoints · {sealed} sealed · {questions} questions at the Customs House
+            {cleared && ' · cleared ✓'}
           </p>
-          {!unlocked && (
-            <p className="brief-warn">
-              Unsurveyed: clear the previous Customs House before you can set
-              foot here. You may read the brief.
-            </p>
-          )}
+          {!unlocked && <p className="brief-warn">Unsurveyed: clear the previous Customs House before you can set foot here. You may read the brief.</p>}
           {unlocked && !charted && (
             <p className="brief-warn">
-              Not yet charted: the lessons below are planned, but their examples
-              and trials haven't been written. Ask Claude to chart this phase.
+              Not yet charted: the lessons below are planned, but their examples and trials haven't been written. Ask Claude to chart this phase.
             </p>
           )}
 
@@ -89,13 +73,10 @@ export function RegionBrief({ phase }) {
                 Start with: {next.title} →
               </button>
             )}
-            <button
-              className={`btn${next ? "" : " btn-primary"}`}
-              onClick={toMap}
-            >
+            <button className={`btn${next ? '' : ' btn-primary'}`} onClick={toMap}>
               Show the waypoint map
             </button>
-            <button className="btn" onClick={() => navigate("/")}>
+            <button className="btn" onClick={() => navigate('/')}>
               ↩ The Atlas
             </button>
           </div>
@@ -105,20 +86,14 @@ export function RegionBrief({ phase }) {
           <h2 className="brief-h">What you will learn</h2>
           <ol className="brief-list">
             {phase.lessons.map((l, i) => {
-              const done = isMastered(recOf(l));
-              const go = unlocked && l.charted;
-              const after = l.prereqs.map((p) => titleOf[p]).filter(Boolean);
+              const done = isMastered(recOf(l))
+              const review = isReviewDue(recOf(l))
+              const go = unlocked && l.charted
+              const after = l.prereqs.map((p) => titleOf[p]).filter(Boolean)
               return (
-                <li
-                  key={l.id}
-                  className={`brief-item${done ? " is-sealed" : ""}${go ? " is-open" : ""}${l.id === next?.id ? " is-next" : ""}`}
-                >
+                <li key={l.id} className={`brief-item${done ? ' is-sealed' : ''}${review ? ' is-review' : ''}${go ? ' is-open' : ''}${l.id === next?.id ? ' is-next' : ''}`}>
                   <span className="brief-num" aria-hidden>
-                    {done ? (
-                      <WaxSeal size={30} letter={String(i + 1)} />
-                    ) : (
-                      i + 1
-                    )}
+                    {done ? <WaxSeal size={30} letter={String(i + 1)} /> : i + 1}
                   </span>
                   {/* A real <button> when it's reachable: keyboard + screen readers for free. */}
                   {go ? (
@@ -131,15 +106,14 @@ export function RegionBrief({ phase }) {
                   <p className="brief-why">
                     <Inline text={l.why} />
                   </p>
-                  {after.length > 0 && (
-                    <p className="brief-after">after {after.join(", ")}</p>
-                  )}
+                  {review && <p className="brief-after review-due">↻ review due</p>}
+                  {after.length > 0 && <p className="brief-after">after {after.join(', ')}</p>}
                 </li>
-              );
+              )
             })}
           </ol>
         </section>
       </article>
     </div>
-  );
+  )
 }

@@ -2,6 +2,9 @@
 import { useRef, useState } from 'react'
 import { Editor, LiveError, LivePreview, LiveProvider } from 'react-live'
 import { PARCHMENT_THEME, SCOPE, appendRender } from './liveScope.js'
+import { Inline } from './Inline.jsx'
+
+const squash = (code) => code.replace(/\s+/g, '')
 
 export function Specimen({ example, onFirstEdit }) {
   const [code, setCode] = useState(example.code)
@@ -11,7 +14,9 @@ export function Specimen({ example, onFirstEdit }) {
 
   function handleChange(next) {
     setCode(next)
-    if (!reported.current && next !== example.code) {
+    // Whitespace-insensitive: re-indenting or a stray newline isn't an
+    // experiment. Changing a token is.
+    if (!reported.current && squash(next) !== squash(example.code)) {
       reported.current = true
       onFirstEdit()
     }
@@ -54,15 +59,4 @@ export function Specimen({ example, onFirstEdit }) {
       )}
     </div>
   )
-}
-
-/** Tiny formatter: `code`, **bold**, *italic*. Splitting into React nodes (not innerHTML) keeps it XSS-safe. */
-export function Inline({ text }) {
-  const parts = text.split(/(`[^`]+`|\*\*[^*]+\*\*|\*[^*]+\*)/g)
-  return parts.map((p, i) => {
-    if (p.startsWith('`')) return <code key={i}>{p.slice(1, -1)}</code>
-    if (p.startsWith('**')) return <strong key={i}>{p.slice(2, -2)}</strong>
-    if (p.startsWith('*') && p.length > 2) return <em key={i}>{p.slice(1, -1)}</em>
-    return p
-  })
 }

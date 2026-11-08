@@ -10,7 +10,7 @@ import { memo, useMemo, useState } from 'react'
 import { ancestors, layoutLessons, wrap } from '../atlas/geometry.js'
 import { PLATE_H, regionBox } from '../atlas/chartSpace.js'
 import { navigate } from '../router/useHashRoute.js'
-import { isMastered } from '../store/derive.js'
+import { isMastered, isReviewDue } from '../store/derive.js'
 import { WaxSealMark } from '../game/WaxSeal.jsx'
 import { art } from '../art/index.js'
 
@@ -22,6 +22,7 @@ const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X']
 
 function lessonState(l, rec) {
   if (!l.charted) return 'uncharted'
+  if (isReviewDue(rec)) return 'review' // sealed, but the seal is fading
   if (isMastered(rec)) return 'sealed'
   if (rec?.edited || rec?.trialAttempts || rec?.noted) return 'begun'
   return 'fresh'
@@ -131,7 +132,7 @@ export const RegionPlate = memo(function RegionPlate({ phase, space, visible, lo
             transform={`translate(${x} ${y})`}
             role="button"
             tabIndex={visible && !locked ? 0 : -1}
-            aria-label={`Lesson ${i + 1}: ${l.title}. ${l.why}`}
+            aria-label={`Lesson ${i + 1}: ${l.title}.${st === 'review' ? ' Review due.' : ''} ${l.why}`}
             onMouseEnter={() => setHovered(l.id)}
             onMouseLeave={() => setHovered(null)}
             onFocus={() => setHovered(l.id)}
@@ -140,8 +141,11 @@ export const RegionPlate = memo(function RegionPlate({ phase, space, visible, lo
             onKeyDown={(e) => e.key === 'Enter' && go(l.id)}
           >
             <circle r="34" className="waypoint-hit" />
-            {st === 'sealed' ? (
-              <WaxSealMark r={24} letter={String(i + 1)} />
+            {st === 'sealed' || st === 'review' ? (
+              <>
+                <WaxSealMark r={24} letter={String(i + 1)} />
+                {st === 'review' && <circle r="31" className="review-ring" />}
+              </>
             ) : CAIRN ? (
               // Engraved cairn with a numbered benchmark tag; the ring/core
               // classes stay on the tag so hover and state styles still apply.

@@ -4,8 +4,16 @@ import { PHASES, checkpointFor } from '../content/index.js'
 import { navigate } from '../router/useHashRoute.js'
 import { useExpedition, useRecord } from '../store/ExpeditionProvider.jsx'
 import { XP, isUnlocked } from '../store/derive.js'
-import { Inline } from '../journal/Specimen.jsx'
+import { Inline } from '../journal/Inline.jsx'
 import { WaxSeal } from './WaxSeal.jsx'
+import { dialogProps } from '../ui/dialog.js'
+
+// Word count is a crude proxy, but a 6-word answer to a question whose model
+// answer is 60 words is almost never "the essentials". It doesn't block you; it
+// makes you look twice before self-grading, and the ratio goes to the log so
+// Claude can see which passes were generous.
+const words = (t) => t.trim().split(/\s+/).filter(Boolean).length
+const THIN = 0.35
 
 export function CheckpointGate({ phase }) {
   const { progress } = useExpedition()
@@ -40,7 +48,8 @@ export function CheckpointGate({ phase }) {
   }
 
   function grade(i, ok) {
-    record('checkpoint_answer', { phase: phase.id, index: i, question: questions[i].q, answer: answers[i], selfGrade: ok ? 'pass' : 'miss' })
+    const ratio = Math.round((words(answers[i]) / Math.max(1, words(questions[i].model))) * 100) / 100
+    record('checkpoint_answer', { phase: phase.id, index: i, question: questions[i].q, answer: answers[i], selfGrade: ok ? 'pass' : 'miss', lengthRatio: ratio })
     const next = states.with(i, ok ? 'passed' : 'open')
     setStates(next)
     // Event handler, not effect: we know right here that this click completed
@@ -90,6 +99,11 @@ export function CheckpointGate({ phase }) {
                   </p>
                   <div className="pane-label">You wrote</div>
                   <p className="yours">{answers[i]}</p>
+                  {states[i] === 'revealed' && words(answers[i]) < words(q.model) * THIN && (
+                    <p className="gate-thin">
+                      Your answer is {words(answers[i])} words; the model is {words(q.model)}. Compare them point by point before you claim the essentials.
+                    </p>
+                  )}
                   {states[i] === 'revealed' ? (
                     <div className="gate-grade">
                       <button className="btn btn-primary" onClick={() => grade(i, true)}>
@@ -130,7 +144,7 @@ export function CheckpointGate({ phase }) {
 function Shell({ phase, children }) {
   return (
     <div className="overlay" onClick={(e) => e.target === e.currentTarget && navigate(`/${phase.id}`)}>
-      <article className="sheet gate">
+      <article className="sheet gate" {...dialogProps} aria-label="The Customs House">
         <button className="book-close" onClick={() => navigate(`/${phase.id}`)} aria-label="Close">
           ✕
         </button>

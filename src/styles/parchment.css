@@ -553,3 +553,14 @@ button.brief-title:hover, button.brief-title:focus-visible { color: var(--oxbloo
   .brief { grid-template-columns: 1fr; }
   .brief-side { border-right: none; padding-right: 0; }
 }
+.note-meter.is-enough { color: var(--verdigris); font-style: normal; }
+.gate-thin { font-style: italic; color: var(--alarm); border-left: 3px solid var(--alarm); padding: 4px 10px; margin: 6px 0; }
+
+/* ------------------------------------------------------------ spaced review */
+/* A due seal fades: still yours, but the memory needs refreshing. */
+.seal-progress.is-review .wax-seal, .brief-item.is-review .wax-seal { opacity: 0.45; filter: grayscale(0.6); }
+.review-due { color: var(--oxblood); font-style: italic; }
+.waypoint.is-review image, .waypoint.is-review path, .waypoint.is-review text { opacity: 0.5; }
+.waypoint.is-review .review-ring { fill: none; stroke: var(--oxblood); stroke-width: 2; stroke-dasharray: 4 4; opacity: 1; }
+.overlay-loading { color: var(--parchment-light); font-style: italic; font-size: 20px; align-items: center; }
+.chart-layer { display: contents; }

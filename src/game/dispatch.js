@@ -15,7 +15,8 @@ export function buildDispatch(progress, log) {
   out.push(`I'm learning React with my roadmap app. Please review my progress, grade my checkpoint answers, and tell me what to focus on next.`)
   out.push('')
   out.push(`- Rank: **${s.rank}** (${s.xp} XP) · streak ${computeStreak(log)} day(s)`)
-  out.push(`- Day ${s.day} of ${progress.planDays} · ${s.lessonsMastered} lessons sealed, ${s.lessonsExpectedByToday} expected by today${s.behindSchedule ? ' (**behind**)' : ''}`)
+  out.push(`- Day ${s.day} of ${progress.planDays} · ${s.lessonsMastered} lessons sealed, ${s.lessonsExpectedByToday} expected by today${s.behindSchedule ? ' (**behind**)' : ''}${s.awaitingCharts ? ' (all written lessons sealed: chart the next phase)' : ''}`)
+  if (s.reviewsDue.length) out.push(`- Reviews due: ${s.reviewsDue.join(', ')}`)
   out.push(`- Checkpoints passed: ${s.phasesPassed.join(', ') || 'none yet'} · suggested next: ${s.suggestedNext ?? '—'}`)
   out.push('')
 
