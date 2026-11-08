@@ -1,0 +1,50 @@
+{"type":"session_start","ts":"2026-11-08T06:49:40.900Z"}
+{"type":"session_start","ts":"2026-11-08T06:50:02.658Z"}
+{"type":"session_start","ts":"2026-11-08T06:50:03.120Z"}
+{"type":"session_start","ts":"2026-11-08T06:50:32.424Z"}
+{"type":"lesson_opened","ts":"2026-11-08T06:50:39.450Z","phase":"p0","lesson":"closures"}
+{"type":"lesson_opened","ts":"2026-11-08T06:50:54.744Z","phase":"p0","lesson":"closures"}
+{"type":"session_start","ts":"2026-11-08T06:50:54.744Z"}
+{"type":"lesson_opened","ts":"2026-11-08T06:51:01.933Z","phase":"p0","lesson":"closures"}
+{"type":"session_start","ts":"2026-11-08T06:51:01.934Z"}
+{"type":"trial_attempt","ts":"2026-11-08T06:51:58.860Z","phase":"p0","lesson":"closures","pass":false,"code":"const buoys = []\nfor (var i = 1; i <= 3; i++) {\n  buoys.push(() => 'Buoy ' + i)\n}\n\nfunction App() {\n  return <ul>{buoys.map((b, idx) => <li key={idx}>{b()}</li>)}</ul>\n}","failed":["Lists Buoy 1, Buoy 2, Buoy 3"]}
+{"type":"lesson_opened","ts":"2026-11-08T06:52:22.056Z","phase":"p0","lesson":"closures"}
+{"type":"session_start","ts":"2026-11-08T06:52:22.057Z"}
+{"type":"trial_attempt","ts":"2026-11-08T06:52:27.386Z","phase":"p0","lesson":"closures","pass":false,"code":"const buoys = []\nfor (var i = 1; i <= 3; i++) {\n  buoys.push(() => 'Buoy ' + i)\n}\n\nfunction App() {\n  return <ul>{buoys.map((b, idx) => <li key={idx}>{b()}</li>)}</ul>\n}","failed":["Lists Buoy 1, Buoy 2, Buoy 3","No \"Buoy 4\""]}
+{"type":"note_saved","ts":"2026-11-08T06:52:38.923Z","phase":"p0","lesson":"closures","length":107}
+{"type":"checkpoint_answer","ts":"2026-11-08T06:52:54.456Z","phase":"p0","index":0,"question":"What is a closure, and how does it explain a \"stale\" value inside a `setTimeout` callback?","answer":"Test answer (verification run)","selfGrade":"pass"}
+{"type":"checkpoint_answer","ts":"2026-11-08T06:52:54.643Z","phase":"p0","index":1,"question":"Why does `list.push(x); setList(list)` not re-render, and what is the fix?","answer":"Test answer (verification run)","selfGrade":"pass"}
+{"type":"checkpoint_answer","ts":"2026-11-08T06:52:54.831Z","phase":"p0","index":2,"question":"In what order do these run: sync code, a resolved promise `.then`, a `setTimeout(…, 0)`? Why?","answer":"Test answer (verification run)","selfGrade":"pass"}
+{"type":"checkpoint_passed","ts":"2026-11-08T06:52:54.831Z","phase":"p0"}
+{"type":"lesson_opened","ts":"2026-11-08T06:53:05.181Z","phase":"p1","lesson":"state-snapshot"}
+{"type":"lesson_opened","ts":"2026-11-08T06:53:07.804Z","phase":"p1","lesson":"render-commit"}
+{"type":"lesson_opened","ts":"2026-11-08T06:53:09.225Z","phase":"p1","lesson":"batching"}
+{"type":"lesson_opened","ts":"2026-11-08T06:53:10.668Z","phase":"p1","lesson":"keys-identity"}
+{"type":"lesson_opened","ts":"2026-11-08T06:53:12.090Z","phase":"p0","lesson":"event-loop"}
+{"type":"session_start","ts":"2026-11-08T07:00:05.539Z"}
+{"type":"lesson_opened","ts":"2026-11-08T07:00:16.784Z","phase":"p0","lesson":"closures"}
+{"type":"session_start","ts":"2026-11-08T07:03:46.477Z"}
+{"type":"session_start","ts":"2026-11-08T07:03:46.477Z"}
+{"type":"session_start","ts":"2026-11-08T07:04:46.887Z"}
+{"type":"session_start","ts":"2026-11-08T07:04:47.479Z"}
+{"type":"session_start","ts":"2026-11-08T07:05:38.884Z"}
+{"type":"session_start","ts":"2026-11-08T07:05:58.274Z"}
+{"type":"session_start","ts":"2026-11-08T07:07:55.232Z"}
+{"type":"session_start","ts":"2026-11-08T07:07:55.513Z"}
+{"type":"session_start","ts":"2026-11-08T07:23:11.488Z"}
+{"type":"session_start","ts":"2026-11-08T07:49:14.976Z"}
+{"type":"session_start","ts":"2026-11-08T07:49:16.838Z"}
+{"type":"lesson_opened","ts":"2026-11-08T07:50:49.221Z","phase":"p0","lesson":"closures"}
+{"type":"session_start","ts":"2026-11-08T16:19:45.722Z"}
+{"type":"session_start","ts":"2026-11-08T16:27:31.226Z"}
+{"type":"session_start","ts":"2026-11-08T16:27:51.507Z"}
+{"type":"lesson_opened","ts":"2026-11-08T16:28:11.048Z","phase":"p0","lesson":"references"}
+{"type":"session_start","ts":"2026-11-08T17:02:33.498Z"}
+{"type":"session_start","ts":"2026-11-08T17:04:05.352Z"}
+{"type":"session_start","ts":"2026-11-08T17:14:53.910Z"}
+{"type":"session_start","ts":"2026-11-08T17:14:58.146Z"}
+{"type":"lesson_opened","ts":"2026-11-08T17:16:21.989Z","phase":"p0","lesson":"closures"}
+{"type":"lesson_opened","ts":"2026-11-08T17:18:27.098Z","phase":"p0","lesson":"closures"}
+{"type":"lesson_opened","ts":"2026-11-08T17:18:38.965Z","phase":"p0","lesson":"references"}
+{"type":"lesson_opened","ts":"2026-11-08T17:18:40.956Z","phase":"p0","lesson":"closures"}
+{"type":"lesson_opened","ts":"2026-11-08T17:24:48.208Z","phase":"p0","lesson":"closures"}

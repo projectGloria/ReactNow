@@ -1,0 +1,57 @@
+{
+  "checkpoints": {
+    "p0": {
+      "attempts": 3,
+      "passed": true,
+      "passedAt": "2026-11-08T06:52:54.831Z"
+    }
+  },
+  "lessons": {
+    "p0/closures": {
+      "noted": true,
+      "opened": "2026-11-08T06:50:39.450Z",
+      "trialAttempts": 2
+    },
+    "p0/event-loop": {
+      "opened": "2026-11-08T06:53:12.090Z",
+      "trialAttempts": 0
+    },
+    "p0/references": {
+      "opened": "2026-11-08T16:28:11.048Z",
+      "trialAttempts": 0
+    },
+    "p1/batching": {
+      "opened": "2026-11-08T06:53:09.225Z",
+      "trialAttempts": 0
+    },
+    "p1/keys-identity": {
+      "opened": "2026-11-08T06:53:10.668Z",
+      "trialAttempts": 0
+    },
+    "p1/render-commit": {
+      "opened": "2026-11-08T06:53:07.804Z",
+      "trialAttempts": 0
+    },
+    "p1/state-snapshot": {
+      "opened": "2026-11-08T06:53:05.181Z",
+      "trialAttempts": 0
+    }
+  },
+  "planDays": 36,
+  "startDate": "2026-11-08",
+  "summary": {
+    "behindSchedule": false,
+    "day": 1,
+    "generatedAt": "2026-11-08T17:24:48.224Z",
+    "lessonsExpectedByToday": 0,
+    "lessonsMastered": 0,
+    "phasesPassed": [
+      "p0"
+    ],
+    "rank": "Deckhand",
+    "streak": 1,
+    "suggestedNext": "p0/closures",
+    "xp": 110
+  },
+  "version": 1
+}

@@ -1,0 +1,49 @@
+/* src/styles/tokens.css — the expedition chart palette & type */
+@import '@fontsource/im-fell-english/400.css';
+@import '@fontsource/im-fell-english/400-italic.css';
+@import '@fontsource/im-fell-english-sc/400.css';
+@import '@fontsource/cormorant-garamond/400.css';
+@import '@fontsource/cormorant-garamond/400-italic.css';
+@import '@fontsource/cormorant-garamond/500.css';
+@import '@fontsource/cormorant-garamond/600.css';
+@import '@fontsource/cormorant-garamond/600-italic.css';
+@import '@fontsource/jetbrains-mono/400.css';
+
+:root {
+  /* paper */
+  --parchment: #efe3c6;
+  --parchment-light: #f6edd7;
+  --parchment-dark: #e2d1a8;
+  --foxed: #d8c39a;
+  --sea: #e6d8b4;
+  /* ink */
+  --ink: #2b2118;
+  --ink-soft: #4a3a2a;
+  --sepia: #7a5c3e;
+  --sepia-faint: #a88b67;
+  /* accents */
+  --oxblood: #7d1f1a;
+  --oxblood-bright: #9b2a22;
+  --verdigris: #3f6b5c;
+  --gilt: #b08d3c;
+  --gilt-light: #d4b366;
+  --alarm: #a8241b;
+
+  --font-display: 'IM Fell English', 'Cormorant Garamond', Georgia, serif;
+  --font-sc: 'IM Fell English SC', 'IM Fell English', Georgia, serif;
+  --font-body: 'Cormorant Garamond', Georgia, serif;
+  --font-code: 'JetBrains Mono', Consolas, monospace;
+
+  --ease-ink: cubic-bezier(0.65, 0, 0.35, 1);
+  --shadow-plate: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 10px 30px rgba(43, 33, 24, 0.35);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
