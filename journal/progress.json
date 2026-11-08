@@ -1,0 +1,22 @@
+{
+  "checkpoints": {},
+  "lessons": {},
+  "planDays": 36,
+  "startDate": "2026-11-08",
+  "summary": {
+    "awaitingCharts": false,
+    "behindSchedule": false,
+    "day": 1,
+    "generatedAt": "2026-11-08T18:39:08.468Z",
+    "lessonsCharted": 25,
+    "lessonsExpectedByToday": 0,
+    "lessonsMastered": 0,
+    "phasesPassed": [],
+    "rank": "Deckhand",
+    "reviewsDue": [],
+    "streak": 1,
+    "suggestedNext": "p0/closures",
+    "xp": 0
+  },
+  "version": 1
+}

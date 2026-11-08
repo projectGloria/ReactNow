@@ -6,8 +6,10 @@ import RenderCommitTimeline from './RenderCommitTimeline.jsx'
 import BatchingQueue from './BatchingQueue.jsx'
 import ReconciliationTree from './ReconciliationTree.jsx'
 import EventLoop from './EventLoop.jsx'
+import EffectLifecycle from './EffectLifecycle.jsx'
+import StaleClosureLab from './StaleClosureLab.jsx'
 
-const REGISTRY = { SnapshotInspector, RenderCommitTimeline, BatchingQueue, ReconciliationTree, EventLoop }
+const REGISTRY = { SnapshotInspector, RenderCommitTimeline, BatchingQueue, ReconciliationTree, EventLoop, EffectLifecycle, StaleClosureLab }
 
 export default function Apparatus({ name }) {
   const Viz = REGISTRY[name]

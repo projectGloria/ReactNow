@@ -10,6 +10,7 @@ export const SCOPE = {
   useState: React.useState,
   useEffect: React.useEffect,
   useLayoutEffect: React.useLayoutEffect,
+  useEffectEvent: React.useEffectEvent, // stable since React 19.2; P2 effect-event lesson
   useRef: React.useRef,
   useMemo: React.useMemo,
   useCallback: React.useCallback,

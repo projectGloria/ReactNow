@@ -7,12 +7,13 @@
 //   why / how     -> the cartographer's annotations shown on the map
 //   lessons       -> waypoints; `charted: true` once a lesson has full content
 //
-// Lessons for P0 and P1 live in their own files (full content). Later phases
+// Lessons for P0, P1 and P2 live in their own files (full content). Later phases
 // are "uncharted": titles + why are known, the survey (example/trial) is not.
 // Ask Claude to chart them one phase at a time.
 // ---------------------------------------------------------------------------
 import p0, { checkpoint as p0Checkpoint } from './phases/p0-js.js'
 import p1, { checkpoint as p1Checkpoint } from './phases/p1-rendering.js'
+import p2, { checkpoint as p2Checkpoint } from './phases/p2-effects.js'
 
 /** Helper for not-yet-surveyed lessons. */
 const stub = (id, title, why, prereqs = []) => ({ id, title, why, prereqs, charted: false })
@@ -57,16 +58,8 @@ export const PHASES = [
     seed: 23,
     why: 'Effects synchronize React with things outside React. Used for anything else, they become a swamp.',
     how: 'Effects run after commit, close over one render, and must clean up. Most "effects" should be event handlers or derived values.',
-    lessons: [
-      stub('sync-external', 'Synchronizing with the outside', 'Effects exist for one job: keeping an external system in step with your render output.'),
-      stub('deps-closures', 'Dependencies & stale closures', 'The deps array is not an optimization; it declares which snapshot values your effect reads.', ['sync-external']),
-      stub('cleanup', 'Cleanup', 'Every subscription you open must be closed, or it outlives the render that made it.', ['sync-external']),
-      stub('not-needed', 'You might not need an effect', 'Derived data and event-driven logic in effects cause extra renders and sync bugs.', ['deps-closures']),
-      stub('refs', 'Refs: the escape hatch', 'A ref is a mutable box React ignores during render; perfect for values that should not trigger renders.', ['deps-closures']),
-      stub('effect-event', 'useEffectEvent', 'Read the latest props inside an effect without re-subscribing every time they change.', ['deps-closures', 'refs']),
-      stub('custom-hooks', 'Custom hooks', 'Hooks share stateful logic, not state. Each call gets its own slots on the fiber.', ['cleanup', 'not-needed']),
-      stub('strict-mode', 'StrictMode double-invoke', 'StrictMode mounts twice in dev to prove your cleanup is correct.', ['cleanup']),
-    ],
+    lessons: p2,
+    checkpoint: p2Checkpoint,
   },
   {
     id: 'p3',
